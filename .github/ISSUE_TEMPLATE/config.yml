@@ -1,0 +1,3 @@
+name: "Issue / PR triage"
+description: "Default labels and behavior for the support repo"
+labels: ["triage"]

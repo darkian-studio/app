@@ -1,0 +1,17 @@
+# Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,android,flutter
+# Editor/OS noise — this is a support repo, keep it clean.
+
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Never commit local APKs or secrets here.
+*.apk
+*.aab
+secrets/
+*.keystore
+*.jks

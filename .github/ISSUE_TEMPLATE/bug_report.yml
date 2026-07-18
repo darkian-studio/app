@@ -1,0 +1,69 @@
+name: Bug report
+description: Report a problem with Darkian Studio (beta)
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please fill this out as completely as you can.
+        Attach DS diagnostics logs (Settings → Diagnostics → Diagnostics logs → copy).
+  - type: input
+    id: ds_version
+    attributes:
+      label: DS version
+      description: Settings → About → App version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Runtime platform
+      options:
+        - Termux (Android)
+        - Linux
+        - macOS
+        - Windows (dsterm remote)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What happened?
+      description: A clear description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce it?
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Diagnostics logs / crash report
+      description: Paste from Settings → Diagnostics. Redact as needed but keep timestamps/errors.
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I ran the setup command and verified the runtime in DS.
+        - label: I searched existing issues for duplicates.
