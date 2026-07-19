@@ -2,9 +2,10 @@
 #
 # Darkian Studio — runtime setup script
 #
-# Installs the DS toolchain (node, dsterm, git-pnp, code-server) for the
-# current platform. DS invokes this from onboarding; users can also run it
-# manually in Termux / a Linux shell / macOS.
+# Installs the DS toolchain (node, dsterm, git-pnp, code-server, netcat,
+# python) for the current platform. DS only shows this command during
+# onboarding — it does not run or manage this script. Run it yourself in
+# Termux / a Linux shell / macOS.
 #
 #   curl -fsSL https://raw.githubusercontent.com/darkian-studio/app/main/install.sh | bash
 #
@@ -57,8 +58,9 @@ install_termux() {
     pkg install -y tur-repo || die "Failed to install tur-repo."
   fi
   pkg update -y || warn "pkg update (post tur-repo) returned non-zero."
-  log "Installing nodejs, git, curl, code-server…"
-  pkg install -y nodejs git curl code-server || die "Package install failed."
+  log "Installing nodejs, git, curl, code-server, netcat, python…"
+  pkg install -y nodejs git curl code-server netcat-openbsd python || die "Package install failed."
+  install_git_pnp
 }
 
 install_linux() {
@@ -67,16 +69,19 @@ install_linux() {
     sudo -v >/dev/null 2>&1 || warn "sudo not available; some steps may fail."
     log "Installing via apt…"
     sudo apt-get update -y || warn "apt-get update returned non-zero."
-    sudo apt-get install -y nodejs npm git curl || die "apt install failed."
+    sudo apt-get install -y nodejs npm git curl netcat-openbsd python3 python3-pip || die "apt install failed."
     install_code_server_deb
+    install_git_pnp
   elif command -v pacman >/dev/null 2>&1; then
     log "Installing via pacman…"
-    sudo pacman -Syu --noconfirm nodejs npm git curl code-server \
+    sudo pacman -Syu --noconfirm nodejs npm git curl code-server gnu-netcat python python-pip \
       || die "pacman install failed."
+    install_git_pnp
   elif command -v dnf >/dev/null 2>&1; then
     log "Installing via dnf…"
-    sudo dnf install -y nodejs git curl code-server \
+    sudo dnf install -y nodejs git curl code-server nmap-ncat python3 python3-pip \
       || die "dnf install failed."
+    install_git_pnp
   else
     warn "No supported package manager found (apt/pacman/dnf)."
     warn "Install node, git, curl, and code-server manually, then re-run."
@@ -107,29 +112,40 @@ install_macos() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
       || die "Homebrew install failed."
   fi
-  log "Installing node, git, curl, code-server…"
-  brew install node git curl code-server || die "brew install failed."
+  log "Installing node, git, curl, code-server, netcat, python…"
+  brew install node git curl code-server netcat python || die "brew install failed."
+  install_git_pnp
 }
 
-# ---- dsterm (DS-managed runtime helper) -----------------------------------
+# ---- git-pnp (git push & publish CLI) -------------------------------------
+install_git_pnp() {
+  if command -v git-pnp >/dev/null 2>&1 || python3 -m pip show git-pnp >/dev/null 2>&1; then
+    ok "git-pnp already installed."
+    return
+  fi
+  log "Installing git-pnp (pip)…"
+  if command -v pip >/dev/null 2>&1; then
+    pip install --user git-pnp || pip install git-pnp || warn "pip install git-pnp failed."
+  elif command -v pip3 >/dev/null 2>&1; then
+    pip3 install --user git-pnp || pip3 install git-pnp || warn "pip3 install git-pnp failed."
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -m pip install --user git-pnp || python3 -m pip install git-pnp \
+      || warn "python3 -m pip install git-pnp failed."
+  else
+    warn "No pip/python available — skipping git-pnp. Install it manually: pip install git-pnp"
+  fi
+}
+
+# ---- dsterm (local PTY / bridge server DS connects to) ---------------------
 install_dsterm() {
   if command -v dsterm >/dev/null 2>&1; then
     ok "dsterm already installed ($(command -v dsterm))."
     return
   fi
-  log "Installing dsterm (DS runtime helper)…"
-  local dsterm_home="$HOME/.ds"
-  mkdir -p "$dsterm_home"
-  # dsterm is a small shell-based helper shipped with DS. When the DS-managed
-  # distribution is present it is installed via the bundled asset; otherwise we
-  # provision a minimal wrapper so node/git tooling is discoverable.
-  cat > "$dsterm_home/dsterm" <<'EOF'
-#!/usr/bin/env bash
-# Minimal dsterm shim — delegates to the DS-managed runtime.
-exec node "$HOME/.ds/dsterm.js" "$@"
-EOF
-  chmod +x "$dsterm_home/dsterm"
-  ok "dsterm shim written to $dsterm_home/dsterm (replace with DS-managed bundle)."
+  log "Installing dsterm (must be running locally for DS to connect)…"
+  curl -L https://raw.githubusercontent.com/darkian-studio/dsterm/main/install.sh | bash \
+    || warn "dsterm install failed; run it manually: curl -L https://raw.githubusercontent.com/darkian-studio/dsterm/main/install.sh | bash"
+  ok "dsterm install invoked."
 }
 
 # ---- verification --------------------------------------------------------
@@ -140,8 +156,8 @@ verify_runtime() {
       missing+=("$tool")
     fi
   done
-  # code-server and dsterm are optional-but-recommended for full IDE features.
-  for tool in code-server dsterm; do
+  # code-server, dsterm, python and git-pnp are recommended for full DS features.
+  for tool in code-server dsterm python3 python git-pnp; do
     if ! command -v "$tool" >/dev/null 2>&1; then
       warn "$tool not found — some DS features may be limited."
     fi

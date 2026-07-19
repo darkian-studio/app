@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/images/watermark.png" alt="Darkian Studio" width="160" />
+</p>
+
 # Darkian Studio
 
 **Darkian Studio (DS)** is a real, mobile-first IDE that runs on Android and Linux. It brings a code editor, integrated terminal, Language Server Protocol (LSP) support, debugging, and git into a single app — powered by a [Termux](https://termux.dev) or system runtime.
