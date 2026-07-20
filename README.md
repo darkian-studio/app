@@ -6,6 +6,8 @@
 
 **Darkian Studio (DS)** is a real, mobile-first IDE that runs on Android and Linux. It brings a code editor, integrated terminal, Language Server Protocol (LSP) support, debugging, and git into a single app — powered by a [Termux](https://termux.dev) or system runtime.
 
+**Website & docs:** <https://darkian-studio.github.io> — install guide, troubleshooting, comparisons, and FAQ.
+
 This repository (**darkian-studio/app**) is the **public support and release home** for Darkian Studio. The application source code is private; this repo exists so external users can download releases, report bugs, request features, and read diagnostics guidance.
 
 > **Status:** First public **beta**. Expect rough edges. See [Known Limitations](#known-limitations).
