@@ -186,9 +186,30 @@ main() {
 
   install_dsterm
   verify_runtime
+  start_dsterm
 
   printf "\n${C_GREEN}Setup complete.${C_RESET} Open Darkian Studio and start coding.\n"
   printf "${C_DIM}Report issues at https://github.com/darkian-studio/app/issues${C_RESET}\n"
+}
+
+# ---- start dsterm (runs on exit so DS can connect immediately) ------------
+start_dsterm() {
+  if ! command -v dsterm >/dev/null 2>&1; then
+    warn "dsterm not found — skipping auto-start. Start it manually: dsterm --allow-any-origin"
+    return
+  fi
+  # Avoid spawning a second instance if one is already listening.
+  if pgrep -f 'dsterm' >/dev/null 2>&1; then
+    ok "dsterm already running."
+    return
+  fi
+  log "Starting dsterm in the background…"
+  nohup dsterm --allow-any-origin >/dev/null 2>&1 &
+  if pgrep -f 'dsterm' >/dev/null 2>&1; then
+    ok "dsterm started."
+  else
+    warn "dsterm did not start — start it manually: dsterm --allow-any-origin"
+  fi
 }
 
 main "$@"
