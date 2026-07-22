@@ -15,10 +15,6 @@
 
 **Website & docs:** <https://darkian-studio.github.io> — install guide, troubleshooting, comparisons, and FAQ.
 
-<p align="center">
-  <video src="assets/videos/ds_demo.mp4" controls width="320" poster="assets/images/watermark.png"></video>
-</p>
-
 This repository (**darkian-studio/app**) is the **public support and release home** for Darkian Studio. The application source code is private; this repo exists so external users can download releases, report bugs, request features, and read diagnostics guidance.
 
 > **Status:** First public **beta**. Expect rough edges. See [Known Limitations](#known-limitations).
