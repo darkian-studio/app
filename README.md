@@ -2,11 +2,22 @@
   <img src="assets/images/watermark.png" alt="Darkian Studio" width="160" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/darkian-studio/app/releases"><img src="https://img.shields.io/github/v/release/darkian-studio/app?include_prereleases&label=latest%20release" alt="Latest release"></a>
+  <a href="https://github.com/darkian-studio/app/releases"><img src="https://img.shields.io/github/downloads/darkian-studio/app/total" alt="Total downloads"></a>
+  <img src="https://img.shields.io/badge/platform-Android%20%7C%20Linux-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
+</p>
+
 # Darkian Studio
 
 **Darkian Studio (DS)** is a real, mobile-first IDE that runs on Android and Linux. It brings a code editor, integrated terminal, Language Server Protocol (LSP) support, debugging, and git into a single app — powered by a [Termux](https://termux.dev) or system runtime.
 
 **Website & docs:** <https://darkian-studio.github.io> — install guide, troubleshooting, comparisons, and FAQ.
+
+<p align="center">
+  <video src="assets/videos/ds_demo.mp4" controls width="320" poster="assets/images/watermark.png"></video>
+</p>
 
 This repository (**darkian-studio/app**) is the **public support and release home** for Darkian Studio. The application source code is private; this repo exists so external users can download releases, report bugs, request features, and read diagnostics guidance.
 
