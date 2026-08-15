@@ -52,7 +52,7 @@ The app is **not** on the Play Store. APKs are distributed here as GitHub Releas
 3. **Open DS** and complete onboarding. On the *Run the setup* step, copy the command and paste it into Termux:
 
 ```sh
-pkg install curl; curl -fsSL https://raw.githubusercontent.com/darkian-studio/app/main/install.sh | bash
+pkg install openssl ngtcp2 curl; curl -fsSL https://raw.githubusercontent.com/darkian-studio/app/main/install.sh | bash
 ```
 
 4. Tap **Verify setup** in DS. Once it reports the runtime is ready, you are done.
