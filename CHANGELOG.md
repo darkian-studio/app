@@ -2,6 +2,49 @@
 
 All notable changes to Darkian Studio public releases are documented here. This file follows a simplified keep-a-changelog style. Releases are published on GitHub Releases; APKs are attached there.
 
+## [1.0.0-beta.7] - 2026-09-13
+
+### Added
+- **Built-in Linux terminal**: six proot distro runtimes with catalog, install checks, provisioner plan/status, launch builder, Terminals settings screen, session profiles + strip menu, and per-distro brand/codicon glyphs with card UI and blurred dialogs.
+- **Distro installs**: background installs with notification + sheet progress (remaining/ETA), native + Dart notification center, session actions with honest progress, bundled engine binaries with provenance, streaming tar extractor with LOA hardening, and tap-to-install onboarding.
+- **Termux bridge**: RUN_COMMAND bridge with dsterm autostart supervisor; guests self-install dsterm (no fetch step), daemon replaces shell as guest command, in-guest login shell honored, SHELL pinned at boot.
+- **Runtime-aware setup**: onboarding runtime choice with always-ask + per-runtime setup, settings switcher, distro folder projects, onboarding install picker sheet with gated autostart, manager-aware tool installation, and runtime-execution audit logging.
+- **New-tab behavior**: strip "+" follows the interactive default from Settings → Terminals; launch auto-start and seed follow the runtime choice; fresh PTYs reapply resize.
+- **Extension host Tier-1**: native TreeView panes, Tasks wired to the DS terminal, debug config providers wired to DAP, persistent status-bar registry, CM6 decorations, SCM bridging, workbench built-ins with live editor/findFiles/applyEdit, live language provider registry with codeLens refresh, and udocker docker shim.
+- **Mobile API coverage**: Free DevTools webview/auth, plus extended surfaces for ms-python, clangd, debugpy, GitLens, Claude Code, and Blackbox; dsterm parity check with zero frame diff.
+- **Editor**: extension providers merged into the definition family (definition, highlights, folding, links, signature, formatting); darkianDark uses the opencode dark syntax palette.
+- **UI**: collapsible status strip with compact floating pill, status-bar codicons as glyphs, app background bleeding into the status bar, and DsLog tracing for the view-open chain.
+- **Marketplace**: plugin + VSX webview views unified in the hamburger menu, extension commands in the palette and as panes, and correct Install/Uninstall state from the list.
+- **Updates**: APK installs via external browser + DownloadManager (fixes "app not installed").
+- **Diagnostics**: DsLog tracing plus daemon-log capture on terminal start failure, and forensic self-install verification.
+
+### Changed
+- DsRuntime contract/adapters/registry as the single source for home, paths, ports (8767), tools, and copy; extension host is runtime-bound; model client follows the active endpoint.
+- Rootfs handling: link2symlink store kept inside the rootfs and bind-mounted at host paths; pure-Dart tar.xz extraction on a background isolate (no host xz, no ANR).
+- Extension-host bundle builds via the esbuild JS API (fixes CI ELF failure); API surface extended without hard-coded stubs.
+- Editor behaviors: word-only autocomplete, keyboard kept after search dismiss, edited line kept visible, special-keys bar synced with keyboard, Duplicate vs Copy clarified, save shows a green check, friendly errors across 11 screens, and cached tool probes.
+- Terminal perf: debounced metrics resize with repaint-boundary rows.
+- Webviews resolve lazily on first visibility, load extension assets from file origin, and inline file module scripts.
+- Icons: transparent monochrome glyph, square notification vector, cropped status-bar silhouette, FiraCode Nerd Font restored for `lsd` icons.
+- Chrome bar stays LTR in RTL locales; palette activates the owning extension before opening views/commands; empty diffs emit `0,0` hunk headers.
+- Debug APK builds are manual-only to save Actions quota; crash viewer removed in favor of the DsLog viewer with kill switch.
+
+### Fixed
+- Terminal reconnect overlay respects distro backends; daemon streams drained before closing the log sink; missing-engine error is actionable; installed distros wired into the runtime registry; Termux package ensure routed through the DsRuntime adapter.
+- DAP kills stale sessions before start (no more 409) with startup debug logging; watch-expression controller assertion fixed.
+- LSP startup failures are logged instead of swallowed; ChatService session unwraps guarded; DstermEndpoint dual source of truth eliminated; timer/transport/stream leaks closed; mounted/dispose guards added.
+- Hover actions moved into the tri-dot overflow menu.
+
+### Removed
+- `dsterm-not-running` startup banner (replaced by the autostart supervisor + onboarding).
+- Crash viewer screen (use the DsLog viewer).
+- 37 stale widget tests retired (see `docs/retired-widget-tests.md`).
+
+### Known limitations
+- Extensions that expose views currently render blank views.
+
+---
+
 ## [1.0.0-beta.6] - 2026-08-18
 
 ### Added
