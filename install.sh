@@ -2,7 +2,7 @@
 #
 # Darkian Studio — runtime setup script
 #
-# Installs the DS toolchain (node, dsterm, git-pnp, code-server, netcat,
+# Installs the DS toolchain (node, dsterm, git-pnp, netcat,
 # python) for the current platform. DS only shows this command during
 # onboarding — it does not run or manage this script. Run it yourself in
 # Termux / a Linux shell / macOS.
@@ -49,17 +49,11 @@ detect_platform() {
 
 # ---- per-platform installers ---------------------------------------------
 install_termux() {
-  log "Detected Termux — using pkg + tur-repo."
+  log "Detected Termux — using pkg."
   log "Refreshing package lists…"
   pkg update -y || warn "pkg update returned non-zero; continuing."
-  # tur-repo provides code-server on Termux.
-  if ! pkg list-installed 2>/dev/null | grep -q '^tur-repo/'; then
-    log "Installing tur-repo…"
-    pkg install -y tur-repo || die "Failed to install tur-repo."
-  fi
-  pkg update -y || warn "pkg update (post tur-repo) returned non-zero."
-  log "Installing nodejs, git, curl, code-server, netcat, python…"
-  pkg install -y nodejs git curl code-server netcat-openbsd python || die "Package install failed."
+  log "Installing nodejs, git, curl, netcat, python…"
+  pkg install -y nodejs git curl netcat-openbsd python || die "Package install failed."
   install_git_pnp
 }
 
@@ -70,39 +64,21 @@ install_linux() {
     log "Installing via apt…"
     sudo apt-get update -y || warn "apt-get update returned non-zero."
     sudo apt-get install -y nodejs npm git curl netcat-openbsd python3 python3-pip || die "apt install failed."
-    install_code_server_deb
     install_git_pnp
   elif command -v pacman >/dev/null 2>&1; then
     log "Installing via pacman…"
-    sudo pacman -Syu --noconfirm nodejs npm git curl code-server gnu-netcat python python-pip \
+    sudo pacman -Syu --noconfirm nodejs npm git curl gnu-netcat python python-pip \
       || die "pacman install failed."
     install_git_pnp
   elif command -v dnf >/dev/null 2>&1; then
     log "Installing via dnf…"
-    sudo dnf install -y nodejs git curl code-server nmap-ncat python3 python3-pip \
+    sudo dnf install -y nodejs npm git curl nmap-ncat python3 python3-pip \
       || die "dnf install failed."
     install_git_pnp
   else
     warn "No supported package manager found (apt/pacman/dnf)."
-    warn "Install node, git, curl, and code-server manually, then re-run."
+    warn "Install node, git and curl manually, then re-run."
   fi
-}
-
-install_code_server_deb() {
-  if command -v code-server >/dev/null 2>&1; then return; fi
-  log "code-server not in apt repos — fetching the latest release…"
-  local url
-  url="$(curl -fsSL https://api.github.com/repos/coder/code-server/releases/latest \
-    | grep -o 'https://github.com/coder/code-server/releases/download/[^"]*linux-amd64.deb' \
-    | head -n1)" || true
-  if [ -z "${url:-}" ]; then
-    warn "Could not resolve code-server .deb URL; skipping code-server."
-    return
-  fi
-  local tmp; tmp="$(mktemp --suffix=.deb)"
-  curl -fsSL "$url" -o "$tmp" || { warn "code-server download failed; skipping."; return; }
-  sudo apt-get install -y "$tmp" || warn "code-server install failed; skipping."
-  rm -f "$tmp"
 }
 
 install_macos() {
@@ -112,8 +88,8 @@ install_macos() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
       || die "Homebrew install failed."
   fi
-  log "Installing node, git, curl, code-server, netcat, python…"
-  brew install node git curl code-server netcat python || die "brew install failed."
+  log "Installing node, git, curl, netcat, python…"
+  brew install node git curl netcat python || die "brew install failed."
   install_git_pnp
 }
 
@@ -156,8 +132,8 @@ verify_runtime() {
       missing+=("$tool")
     fi
   done
-  # code-server, dsterm, python and git-pnp are recommended for full DS features.
-  for tool in code-server dsterm python3 python git-pnp; do
+  # dsterm, python and git-pnp are recommended for full DS features.
+  for tool in dsterm python3 python git-pnp; do
     if ! command -v "$tool" >/dev/null 2>&1; then
       warn "$tool not found — some DS features may be limited."
     fi
