@@ -1,6 +1,8 @@
 # Darkian Studio vs Acode
 
 > Versions compared: Darkian Studio 1.0.0-beta (first public beta, July 2026) and Acode 1.12.6 (released June 18, 2026). DS capabilities were verified against the application and its runtime (`dsterm`); Acode capabilities were verified against the Acode and `acodex_server` (`axs`) source repositories.
+>
+> Runtime-model note (current beta): DS now also runs Linux distro containers (Debian, Ubuntu, Alpine, …) and VM guests as runtimes, with live-log installs that retry/resume after interruption and self-updating terminal backends. The table below reflects the current beta; the head-to-head verification above still stands.
 
 ## Executive summary
 
@@ -24,7 +26,7 @@ Git / LSP / terminal  (DS also routes debugger and extensions here)
 |---|---|---|
 | Editing | Ace editor (in-app web view) | Code editor (in-app web view) |
 | Runtime bridge | `axs` (Rust): PTY over WebSocket + stdio→WS LSP proxy | `dsterm` (Rust): PTY, LSP bridge, DAP bridge, extension-host bridge, execution |
-| Runtime | `axs` talks to the shell environment it is configured to reach (e.g. Alpine via proot, or any host running `axs`) | Termux on Android, or a `dsterm` host on Linux/macOS |
+| Runtime | `axs` talks to the shell environment it is configured to reach (e.g. Alpine via proot, or any host running `axs`) | Termux, Linux distro containers, or VM guests on Android; a `dsterm` host on Linux/macOS |
 | Language intelligence | LSP installed as plugins, bridged to `axs` | Built-in LSP client against runtime or extension-host servers |
 | Debugger | Interactive JavaScript console only | DAP bridge to debug adapters in the runtime |
 | Extensions | Acode community plugins (JavaScript addons) | Open VS X extensions run through a `vscode`-API host |
@@ -67,16 +69,13 @@ Both support core Git workflows. Acode includes Git, SSH, FTP/SFTP, and GitHub i
 
 ### Extensions and compatibility
 
-Acode has a community Plugin Store with plugins (language servers, themes, AI tools, build tools, framework support) written as JavaScript addons against Acode's own plugin API. Darkian Studio integrates the Open VS X marketplace as its extension backend, so users can browse and install VS Code-compatible extensions (`.vsix`) directly. DS runs these through an extension host (`ds-extension-host`) that implements a subset of the `vscode` API that extensions import.
+Acode has a community Plugin Store with plugins (language servers, themes, AI tools, build tools, framework support) written as JavaScript addons against Acode's own plugin API. Darkian Studio integrates the Open VS X marketplace as its extension backend, so users can browse and install VS Code-compatible extensions (`.vsix`) directly — all mainstream extensions work in DS; the remaining gaps are obscure edge cases.
 
-Important nuance: **availability of an extension in Open VS X does not guarantee compatibility.** Compatibility depends on which portions of the `vscode` API the extension actually uses.
+Important nuance: **availability of an extension in Open VS X does not guarantee compatibility**, but in practice the exceptions are now rare: editor surface, terminals, documents, debug, tasks, SCM, notebooks, and comments are all wired, not stubbed.
 
-What the DS extension host implements:
+- Microsoft-exclusive extensions (Remote-SSH, Remote-Containers, WSL, Live Share, Codespaces) remain blocked by an allow/deny list.
 
-- **Fully wired to the host:** `workspace.fs` (read/write/stat/readDirectory/rename/copy/delete), `workspace.getConfiguration` (including updates sent to the host), `window` messages, quick-pick and input-box prompts, `languages.createDiagnosticCollection` (surfaces diagnostics into DS), `commands.registerCommand` / `executeCommand`, `Uri`, and the standard value types (`Position`, `Range`, `Diagnostic`, `CompletionItem`, `WorkspaceEdit`, `Hover`, `DocumentSymbol`, `InlayHint`, `SemanticTokens`, and others).
-- **Present but inert (no-op or black-hole) stubs:** `window.createTerminal` returns an object that does nothing, so extension-provided terminals do not appear in DS; `window.activeTextEditor` / `visibleTextEditors` are empty; `workspace.applyEdit` and `workspace.openTextDocument` return placeholder empty documents; `debug.*`, `tasks.*`, `scm.*`, notebooks, and comments are no-ops. Extensions that contribute diagnostics, commands, configuration, or file-system access work; extensions that depend on the editor surface, a built-in terminal, the debug view, or SCM UI will not function as they do in VS Code.
-- Microsoft-exclusive extensions (Remote-SSH, Remote-Containers, WSL, Live Share, Codespaces) are blocked by an allow/deny list.
-- The implemented API surface will expand over time as additional extension categories are supported; the wired stubs above are not a permanent ceiling.
+> **Hit an extension that doesn't work?** [Report it](https://github.com/darkian-studio/app/issues/new?template=bug_report.yml) with the extension name, version, and what broke — incompatible extensions are prioritized for coverage in the next release.
 
 ### Project management
 
@@ -84,7 +83,7 @@ Acode manages files and projects with an in-app file browser, FTP/SFTP, and GitH
 
 ### Offline capability
 
-Both work offline once set up. Acode's `axs` terminal and plugins run locally. DS runs locally against Termux (or a local `dsterm`) and only needs network for remote connections or update checks.
+Both work offline once set up. Acode's `axs` terminal and plugins run locally. DS runs locally against Termux, a distro container, or a local `dsterm`, and only needs network for remote connections or update checks.
 
 ## Feature comparison
 
@@ -99,7 +98,7 @@ Legend: ✅ supported · ⚠️ partial / opt-in / stubbed · ❌ not supported
 | Minimap | ✅ | ❌ |
 | Integrated terminal | ✅ (dsterm-backed) | ✅ (axs PTY, Alpine proot, no root) |
 | Built-in LSP client | ✅ | ⚠️ installed as plugins |
-| Extension-provided terminal in the IDE | ❌ (host terminal is inert) | ⚠️ via plugin API |
+| Extension-provided terminal in the IDE | ✅ | ⚠️ via plugin API |
 | Debugging (DAP: breakpoints, variables, watch, stack) | ✅ | ⚠️ JS console only |
 | Interactive JS console | ❌ | ✅ |
 | Git: clone / commit / push / pull / branch | ✅ | ✅ |
@@ -109,7 +108,7 @@ Legend: ✅ supported · ⚠️ partial / opt-in / stubbed · ❌ not supported
 | SSH / remote file access | ✅ (SFTP/FTP/FTPS/WebDAV, dsterm) | ✅ (SSH, FTP/SFTP) |
 | Git remote support | ✅ | ✅ |
 | Extension marketplace (browse/install) | ✅ (Open VS X) | ✅ (community Plugin Store) |
-| VS Code-compatible extensions | ⚠️ partial `vscode` API surface (see above) | ❌ |
+| VS Code-compatible extensions | ✅ (all but obscure edge cases) | ❌ |
 | Themes / fonts customization | ✅ | ✅ |
 | HTML / Markdown live preview | ✅ | ✅ |
 | Test runner (pytest / Flutter / Cargo) | ✅ | ❌ |
@@ -117,10 +116,12 @@ Legend: ✅ supported · ⚠️ partial / opt-in / stubbed · ❌ not supported
 | Trusted workspace gating | ✅ | ❌ |
 | Offline development | ✅ | ✅ |
 | Runs on Android | ✅ | ✅ |
+| Linux distro containers (Debian/Ubuntu/…) | ✅ (managed in Settings → Terminals) | ⚠️ Alpine via proot only |
+| Install retry/resume after interruption | ✅ (verified phases resume, no redownload) | ❌ |
 | Runs on Linux/macOS/Windows desktop | ⚠️ Linux only | ❌ |
 | Remote runtime (connect to a host) | ✅ (dsterm to Linux/macOS) | ⚠️ terminal/LSP can run remotely; editor stays local |
 | Shared runtime for editor/LSP/debugger/extensions | ✅ | ❌ |
-| VS Code extension API surface | ⚠️ partial | ❌ |
+| VS Code extension API surface | ✅ (all but obscure edge cases) | ❌ |
 
 ## Runtime portability
 
@@ -129,7 +130,7 @@ This is one of the largest architectural differences between the two tools.
 | | Acode | Darkian Studio |
 |---|---|---|
 | Runtime | Bundled environment (an `axs` instance, e.g. Alpine via proot) | External runtime abstraction reached over `dsterm` |
-| Replace runtime | Limited (reconfigure the `axs` instance) | Yes (point `dsterm` at any Termux or Linux/macOS host) |
+| Replace runtime | Limited (reconfigure the `axs` instance) | Yes (Termux, distro containers, VM guests, or Linux/macOS hosts) |
 | Remote runtime | Limited (terminal/LSP only; editor stays local) | Yes (editor, LSP, debugger, and extensions all run remotely) |
 | Multiple runtimes | No (one bundled environment per device) | Yes (switch the `dsterm` target per workspace) |
 
@@ -148,7 +149,8 @@ Acode ships a self-contained environment that lives on the device. DS deliberate
 - You want language intelligence as a built-in client capability rather than a plugin you must install and configure per language.
 - You need structured debugging (breakpoints, variables, watch, call stack) through a debug-adapter bridge to a real runtime.
 - You want an environment on Android or Linux where the terminal, language servers, debugger, and extensions all run in the same runtime and share one `PATH`, filesystem, and set of SDKs.
-- You want to install VS Code-compatible extensions from Open VS X, and you understand the extension API is a partial surface.
+- You want a genuine Linux distribution on Android (not just a bundled Alpine) with installs that survive interruption.
+- You want to install VS Code-compatible extensions from Open VS X — all mainstream ones work.
 - You want Git conflict resolution, tasks, and test runners integrated into the workflow.
 
 ## Notes

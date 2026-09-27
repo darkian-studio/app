@@ -11,7 +11,7 @@
 
 # Darkian Studio
 
-**Darkian Studio (DS)** is a real, mobile-first IDE that runs on Android and Linux. It brings a code editor, integrated terminal, Language Server Protocol (LSP) support, debugging, and git into a single app — powered by a [Termux](https://termux.dev) or system runtime.
+**Darkian Studio (DS)** is a real, mobile-first IDE that runs on Android and Linux. It brings a code editor, integrated terminal, Language Server Protocol (LSP) support, debugging, and git into a single app — powered by a runtime you choose: [Termux](https://termux.dev), a Linux distro container (Debian, Ubuntu, Alpine, …), a VM guest, or a remote host.
 
 **Website & docs:** <https://darkian-studio.github.io> — install guide, troubleshooting, comparisons, and FAQ.
 
@@ -24,7 +24,7 @@ This repository (**darkian-studio/app**) is the **public support and release hom
 ## What is Darkian Studio?
 
 - **Editor** — syntax highlighting, multiple languages, command palette.
-- **Terminal** — a full shell through your runtime (Termux on Android).
+- **Terminal** — a full shell in your chosen runtime (Termux, a distro container, a VM guest, or a remote host).
 - **LSP & debugging** — language intelligence and breakpoints.
 - **Git** — clone, commit, push, and review changes.
 - **Extension host** — a sidecar runtime for optional editor extensions.
@@ -38,6 +38,8 @@ DS is designed for developers who want a genuine coding environment on a phone o
 This is the **first public beta**. We are focused on:
 
 - Making onboarding reliable (one setup command provisions the runtime).
+- Resilient Linux distro installs: live logs, explicit phases, and retry/resume after interruption instead of starting over.
+- Self-updating terminal backends (staged `dsterm` updates you apply with a restart).
 - Capturing useful diagnostics inside the app instead of requiring ADB/Flutter.
 - A simple, transparent update path via GitHub Releases.
 
@@ -55,15 +57,15 @@ The app is **not** on the Play Store. APKs are distributed here as GitHub Releas
 pkg install openssl ngtcp2 curl; curl -fsSL https://raw.githubusercontent.com/darkian-studio/app/main/install.sh | bash
 ```
 
-4. Tap **Verify setup** in DS. Once it reports the runtime is ready, you are done.
-
 The setup script is **runtime aware**: it uses the correct commands for **Termux**, **Linux** (apt/pacman/dnf), and **macOS** (Homebrew), skips already-installed components, and verifies the result before exiting.
+
+> **No Termux? No problem.** During onboarding you can pick a Linux distro container (Debian, Ubuntu, Alpine, …) instead — DS downloads and installs it with live progress, and you can manage, reinstall, or switch runtimes later in **Settings → Terminals**. Distro installs survive interruption: retrying resumes verified phases instead of redownloading.
 
 ---
 
 ## How to report bugs
 
-Please use the **Bug report** issue template: <https://github.com/darkian-studio/app/issues/new?template=bug_report.yml>
+Please use the [**Bug report** issue template](https://github.com/darkian-studio/app/issues/new?template=bug_report.yml).
 
 Before filing, gather the information below so we can reproduce quickly.
 
@@ -116,6 +118,7 @@ Read the detailed comparisons:
 ## Discussions & feature requests
 
 - **Feature requests:** use the template at <https://github.com/darkian-studio/app/issues/new?template=feature_request.yml>
+- **Extensions that don't work:** file a [bug report](https://github.com/darkian-studio/app/issues/new?template=bug_report.yml) with the extension name, version, and what broke — incompatible extensions are prioritized for coverage in the next release.
 - **General questions / show-and-tell:** use [GitHub Discussions](https://github.com/darkian-studio/app/discussions).
 
 We do **not** accept code contributions to the application here — see [CONTRIBUTING](CONTRIBUTING.md). This repo is for issues, discussions, and releases only.
