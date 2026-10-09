@@ -2,6 +2,45 @@
 
 All notable changes to Darkian Studio public releases are documented here. This file follows a simplified keep-a-changelog style. Releases are published on GitHub Releases; APKs are attached there.
 
+## [1.0.0-beta.8] - 2026-10-09
+
+### Added
+- **GitHub in the app**: a GitHub-shaped repo screen with paginated branches, a repo actions menu carrying Clone and the write-target header, fork-and-commit for repos you do not own, commit gating, and repository search by URL or query across Account and All scopes.
+- **GitLab and Bitbucket**: GitLab with PKCE auth and a production OAuth application, Bitbucket wired with a consumer key; both share the GitHub chrome, brand marks, and writable-provider handling so clone, commit, and fetch work the same way across all three.
+- **Knowledge packs**: a native reader WebView with a Kotlin bridge, a rev5 reader tree with a thin header and anchored menu, theme modes, and DSPack storage that installs onto the runtime like any other asset. Kiwix entries show a real pre-download size from a HEAD probe.
+- **AI providers**: Anthropic and Gemini adapters alongside OpenAI/Claude defaults, per-model sampling settings derived from provider variants, expandable model cards with pricing and free-tier detection, and a model picker with search, free filter, and sorting.
+- **Tool approvals**: brokered approvals with stable IDs and a FIFO queue, split allow/deny cards, scope radios, decoded paths, and a failure taxonomy with a second approval step.
+- **Notifications**: a native notification center with channel taxonomy, groups, permission gating, deep links, in-app actions, and a notifier that suppresses what you have already seen.
+- **PDF viewer**: outline sheet, link teleport, go-to-page, resume position, working search, a password dialog, physics scrolling, and graceful failure on unreadable files.
+- **LaTeX**: run, texlab LSP, preview flip, and syntax highlighting.
+- **Markdown**: GitHub-style alert callouts in chat, hover, and update notes.
+- **Open with**: hand any file to another app through a FileProvider chooser.
+- **Settings redesign**: a hub with category pages, needs-attention row, and search, rebuilt across Permissions, Terminals, and Languages with shared components and semantic theme tokens. Permissions becomes the home for the notification controls.
+- **Per-extension settings** and a configuration-contribution model.
+- **VM guests**: managed lifecycle, launch orchestration, capability probe with hardened diagnostics, and a guided setup that checks the device before staging guest assets.
+
+### Changed
+- Release signing now uses the upload key, verified against a pinned fingerprint before publishing, so the first install can upgrade in place.
+- Cold start parallelized, watches narrowed to structural selects, pane creation cached, and chrome refreshes coalesced; the editor splices drafts locally and clears hover state defensively.
+- Webviews serve extension assets over loopback HTTP and log their console output and resource errors.
+- Git work and provider screens converge on one set of chrome; clone streams report stuck versus slow instead of appearing hung.
+- Extension identity is case-insensitive, icons are cached from package manifests, and humanized titles resolve unresolved nls keys.
+- Diagnostics log instead of swallowing across 73 call sites, with correct method attribution.
+
+### Fixed
+- Terminal panes no longer touch state after disposal, and editor webview work drains before the workspace is torn down.
+- Startup steps are contained per step and bail once the page is gone, so a failed or dismissed startup no longer cascades.
+- Clone resumes after a SAF grant, carries a stall watchdog, and survives hostile input: split locales, torn frames, and HTTP 416.
+- Tool probes treat a transport failure as a retryable outage rather than caching it as "not installed", and a probe that contradicts the runtime is invalidated.
+- File-only sessions keep the editor appearance you chose, and "open with" adds a tab in every mode instead of only retitling the bar.
+- Settings updates toggles, steppers, and picks in place instead of reopening a sheet.
+- Remote images are size-capped before decode; heavy files get a large-file editor mode.
+
+### Known limitations
+- Pressing **Exit workspace** immediately after entering a project or a single-file view can crash the app. The terminal pane no longer reads state after disposal and editor layout work is drained before teardown, which closes the wider window but does not remove the race entirely.
+
+---
+
 ## [1.0.0-beta.7] - 2026-09-13
 
 ### Added
